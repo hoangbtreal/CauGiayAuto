@@ -1,0 +1,58 @@
+{
+  "name": "Gara Automation: Daily Care & Campaign Cron",
+  "nodes": [
+    {
+      "parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 8 * * *"}]}},
+      "name": "Cron 8h sáng mỗi ngày",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [80, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://erpnext-backend:8000/api/resource/Gara Care Automation Rule?filters=[[\"active\",\"=\",1]]"
+      },
+      "name": "Lấy danh sách Automation Rule",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [280, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tính rule nào 'đến hạn' hôm nay: sinh nhật, ngày lễ theo nghề nghiệp, hoặc điều kiện ngày.\n// Đây là điểm mở rộng — thêm loại trigger mới chỉ cần thêm 1 case, không đổi cấu trúc.\nconst today = new Date();\nconst dd = String(today.getDate()).padStart(2,'0');\nconst mm = String(today.getMonth()+1).padStart(2,'0');\n\nconst rules = $input.first().json.data || [];\nconst due = rules.filter(r => {\n  if (r.trigger_event === 'Vietnamese Teachers Day (20/11)') return dd === '20' && mm === '11';\n  if (r.trigger_event === 'Customer Birthday') return true; // lọc theo từng khách ở bước sau\n  if (r.trigger_event === 'Days Since Last Service') return true; // điều kiện đã nằm trong audience_filter\n  return false;\n});\nreturn due.map(r => ({ json: r }));"
+      },
+      "name": "Lọc Rule Đến Hạn Hôm Nay",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://erpnext-backend:8000/api/resource/Gara Customer?filters={{encodeURIComponent(JSON.stringify($json.audience_filter ? [[$json.audience_filter.split('=')[0].trim(), '=', $json.audience_filter.split('=')[1].trim()]] : []))}}",
+        "note": "Với rule sinh nhật, cần lọc thêm date_of_birth trùng ngày/tháng hôm nay ở bước kế — audience_filter chỉ xử lý điều kiện dạng field=value đơn giản."
+      },
+      "name": "Lấy Khách Hàng Phù Hợp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{$env.MAIN_MESSAGING_WORKFLOW_ID}}",
+        "note": "Gọi lại workflow chính (Multi-Channel Messaging Bus) — TÁI SỬ DỤNG toàn bộ logic Get Channel Priority List → Pick Best Channel → Route By Channel → Log, không viết lại."
+      },
+      "name": "Gửi Qua Workflow Chính",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [880, 300]
+    }
+  ],
+  "connections": {
+    "Cron 8h sáng mỗi ngày": {"main": [[{"node": "Lấy danh sách Automation Rule", "type": "main", "index": 0}]]},
+    "Lấy danh sách Automation Rule": {"main": [[{"node": "Lọc Rule Đến Hạn Hôm Nay", "type": "main", "index": 0}]]},
+    "Lọc Rule Đến Hạn Hôm Nay": {"main": [[{"node": "Lấy Khách Hàng Phù Hợp", "type": "main", "index": 0}]]},
+    "Lấy Khách Hàng Phù Hợp": {"main": [[{"node": "Gửi Qua Workflow Chính", "type": "main", "index": 0}]]}
+  }
+}

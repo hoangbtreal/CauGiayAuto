@@ -1,0 +1,10 @@
+{
+  "description": "Customizable CRM dashboard for auto repair shops enabling role-based work order management, AI-assisted customer support, and real-time workshop insights.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
