@@ -56,7 +56,7 @@ export type ChatwootAuthResult = {
   agentName: string;
 };
 
-// --- Lưu cấu hình kết nối (localStorage) để không phải nhập lại mỗi lần ---
+// --- Lưu cấu hình kết nối theo phiên để tránh giữ token lâu dài trong trình duyệt ---
 const CONFIG_KEY = 'gara-crm:chatwoot-config';
 
 export function loadConfig(): ChatwootConfig | null {

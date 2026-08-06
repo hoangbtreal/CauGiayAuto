@@ -17,10 +17,16 @@ import type {
 import { loadConfig } from './chatwoot';
 
 // --- Cấu hình ---
-const ERPNEXT_BASE = import.meta.env.VITE_ERPNEXT_URL ?? 'http://localhost:8080';
+const ERPNEXT_BASE = import.meta.env.VITE_ERPNEXT_URL ?? '/erpnext';
+const ERPNEXT_FALLBACK_BASE = import.meta.env.VITE_ERPNEXT_FALLBACK_URL ?? 'http://localhost:8080';
 const ENV_CHATWOOT_BASE = import.meta.env.VITE_CHATWOOT_URL ?? 'http://localhost:3000';
 const ENV_CHATWOOT_TOKEN = import.meta.env.VITE_CHATWOOT_API_TOKEN ?? '';
 const ENV_CHATWOOT_ACCOUNT_ID = import.meta.env.VITE_CHATWOOT_ACCOUNT_ID ?? '1';
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+
+export function isDemoMode(): boolean {
+  return DEMO_MODE;
+}
 
 // Ưu tiên config người dùng đã lưu (qua màn hình Cấu hình Chatwoot), fallback env
 function chatwootEnv() {
@@ -32,12 +38,13 @@ function chatwootEnv() {
   };
 }
 
-async function frappeFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${ERPNEXT_BASE}${path}`, {
+async function frappeRequest<T>(base: string, path: string, options: RequestInit): Promise<T> {
+  const res = await fetch(`${base}${path}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...options.headers,
     },
     ...options,
@@ -49,12 +56,32 @@ async function frappeFetch<T>(path: string, options: RequestInit = {}): Promise<
   return res.json();
 }
 
+async function frappeFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  try {
+    return await frappeRequest<T>(ERPNEXT_BASE, path, options);
+  } catch (err) {
+    if (!(err instanceof TypeError) || ERPNEXT_BASE !== '/erpnext') {
+      throw err;
+    }
+    try {
+      return await frappeRequest<T>(ERPNEXT_FALLBACK_BASE, path, options);
+    } catch (fallbackErr) {
+      throw new Error(
+        fallbackErr instanceof TypeError
+          ? `Không kết nối được ERPNext qua ${ERPNEXT_BASE} hoặc ${ERPNEXT_FALLBACK_BASE}. Hãy reload app và kiểm tra frontend đang chạy ở http://localhost:8443.`
+          : fallbackErr instanceof Error ? fallbackErr.message : 'Không thể gọi ERPNext API'
+      );
+    }
+  }
+}
+
 async function chatwootFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const { base, token } = chatwootEnv();
   const res = await fetch(`${base}${path}`, {
     headers: {
       'api_access_token': token,
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...options.headers,
     },
     ...options,
@@ -152,11 +179,27 @@ export async function getCustomers(search?: string): Promise<GaraCustomer[]> {
   return res.data;
 }
 
+export async function createCustomer(payload: Partial<GaraCustomer>): Promise<GaraCustomer> {
+  const res = await frappeFetch<FrappeDocResponse<GaraCustomer>>(
+    '/api/resource/Gara Customer',
+    { method: 'POST', body: JSON.stringify(payload) }
+  );
+  return res.data;
+}
+
 export async function searchVehicles(query: string): Promise<GaraVehicle[]> {
   const filters = JSON.stringify([['license_plate', 'like', `%${query}%`]]);
   const fields = JSON.stringify(['name', 'license_plate', 'car_brand', 'car_model', 'owner']);
   const res = await frappeFetch<FrappeListResponse<GaraVehicle>>(
     `/api/resource/Gara Vehicle?filters=${filters}&fields=${fields}&limit=20`
+  );
+  return res.data;
+}
+
+export async function createVehicle(payload: Partial<GaraVehicle>): Promise<GaraVehicle> {
+  const res = await frappeFetch<FrappeDocResponse<GaraVehicle>>(
+    '/api/resource/Gara Vehicle',
+    { method: 'POST', body: JSON.stringify(payload) }
   );
   return res.data;
 }

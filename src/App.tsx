@@ -8,6 +8,7 @@ import { EscalateQueue } from './screens/EscalateQueue';
 import { WorkshopOverview } from './screens/WorkshopOverview';
 import { CustomerVehicleStatus } from './screens/CustomerVehicleStatus';
 import { AIConfig } from './screens/AIConfig';
+import { BrowserTestScreen } from './screens/BrowserTestScreen';
 import type { WorkOrder } from './lib/types';
 
 function App() {
@@ -47,6 +48,8 @@ function App() {
         return <WorkshopOverview />;
       case 'ai-config':
         return <AIConfig />;
+      case 'browser-test':
+        return <BrowserTestScreen />;
       default:
         return <WorkOrderBoard onSelectOrder={handleSelectOrder} />;
     }

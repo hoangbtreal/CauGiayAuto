@@ -50,11 +50,15 @@ export function WorkOrderDetail({
       setOrder(data);
       setNotes(data.technical_notes ?? '');
       setSelectedStatus(data.status);
-    } catch {
-      console.warn('API error, using initial mock data');
-      setOrder(initialOrder);
-      setNotes(initialOrder.technical_notes ?? '');
-      setSelectedStatus(initialOrder.status);
+    } catch (e) {
+      if (api.isDemoMode()) {
+        console.warn('API error, using initial demo mock data');
+        setOrder(initialOrder);
+        setNotes(initialOrder.technical_notes ?? '');
+        setSelectedStatus(initialOrder.status);
+      } else {
+        setError(e instanceof Error ? e.message : 'Không thể tải chi tiết Work Order');
+      }
     } finally {
       setLoading(false);
     }
@@ -72,8 +76,12 @@ export function WorkOrderDetail({
       setOrder(updated);
       setNotes(updated.technical_notes ?? '');
       setSelectedStatus(updated.status);
-    } catch {
-      console.warn('Save API failed, simulating mock save');
+    } catch (e) {
+      if (!api.isDemoMode()) {
+        setError(e instanceof Error ? e.message : 'Không thể lưu thay đổi');
+        return;
+      }
+      console.warn('Save API failed, simulating demo mock save');
       const mockUpdated = { ...order, status: selectedStatus, technical_notes: notes };
       setOrder(mockUpdated);
       

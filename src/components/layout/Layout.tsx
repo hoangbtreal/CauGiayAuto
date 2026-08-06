@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, AlertCircle, Wrench, Menu, MessageSquare, Phone, Bot } from 'lucide-react';
+import { LayoutDashboard, Users, AlertCircle, Wrench, Menu, MessageSquare, Phone, Bot, CheckCircle } from 'lucide-react';
 
 export function Layout({ 
   children,
@@ -38,6 +38,7 @@ export function Layout({
             </div>
             <NavItem icon={<Bot size={20} />} label="Cấu hình AI Agent" active={activeTab === 'ai-config'} onClick={() => handleNavClick('ai-config')} />
             <NavItem icon={<Phone size={20} />} label="Trạng thái xe (Demo)" active={activeTab === 'customer-status'} onClick={() => handleNavClick('customer-status')} />
+            <NavItem icon={<CheckCircle size={20} />} label="Browser Test (VCM)" active={activeTab === 'browser-test'} onClick={() => handleNavClick('browser-test')} />
           </ul>
         </nav>
       </aside>

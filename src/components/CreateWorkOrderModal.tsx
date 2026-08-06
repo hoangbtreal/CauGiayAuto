@@ -34,23 +34,40 @@ export function CreateWorkOrderModal({ onClose, onCreated }: CreateWorkOrderModa
     setLoading(true);
     setError(null);
     try {
-      // Mock logic nếu API fail sẽ catch
+      const normalizedPlate = formData.license_plate.trim().toUpperCase();
+      const customers = await api.getCustomers(formData.customer_name.trim());
+      const customer = customers.find(c => c.customer_name === formData.customer_name.trim())
+        ?? await api.createCustomer({
+          tenant_id: 'demo-gara-01',
+          customer_name: formData.customer_name.trim(),
+          phone_number: formData.customer_phone.trim() || 'unknown',
+        });
+      const vehicles = await api.searchVehicles(normalizedPlate);
+      const vehicle = vehicles.find(v => v.license_plate === normalizedPlate)
+        ?? await api.createVehicle({
+          tenant_id: 'demo-gara-01',
+          license_plate: normalizedPlate,
+          owner: customer.name,
+        });
       const newOrder = await api.createWorkOrder({
-        license_plate: formData.license_plate,
+        tenant_id: 'demo-gara-01',
+        license_plate: vehicle.name,
         customer_requests: formData.customer_requests,
-        // (API schema yêu cầu thêm các trường nếu cần)
         status: 'Tiếp nhận',
         total_amount: 0,
       });
       onCreated(newOrder);
     } catch (err) {
-      console.warn('API error, using mock creation:', err);
-      // Fallback cho chế độ mock
+      if (!api.isDemoMode()) {
+        setError(err instanceof Error ? err.message : 'Không thể tạo Work Order');
+        return;
+      }
+      console.warn('API error, using demo mock creation:', err);
       const mockOrder: WorkOrder = {
         name: `WO-NEW-${Date.now()}`,
         order_id: `WO-${Math.floor(Math.random() * 10000)}`,
         tenant_id: 'demo-gara-01',
-        license_plate: formData.license_plate,
+        license_plate: formData.license_plate.trim().toUpperCase(),
         status: 'Tiếp nhận',
         total_amount: 0,
         customer_requests: formData.customer_requests,

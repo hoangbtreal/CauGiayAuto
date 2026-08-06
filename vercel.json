@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/erpnext/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/erpnext/:path*" },
+    { "source": "/chatwoot/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/chatwoot/:path*" }
+  ]
+}

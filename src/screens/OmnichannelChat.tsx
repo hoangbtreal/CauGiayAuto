@@ -560,7 +560,7 @@ function ChatwootSettings({
                 {busy ? 'Đang đăng nhập...' : 'Đăng nhập & lấy token'}
               </Button>
               <p className="text-xs text-[var(--color-text-muted)] mt-2">
-                Token chỉ được lưu trong trình duyệt này (localStorage) và dùng để gọi API Chatwoot + kết nối realtime.
+                Token chỉ được lưu trong phiên tab hiện tại và dùng để gọi API Chatwoot + kết nối realtime.
               </p>
             </div>
           </div>

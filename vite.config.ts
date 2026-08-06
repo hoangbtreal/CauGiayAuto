@@ -34,6 +34,18 @@ export default defineConfig(({ mode }) => {
       port: parseInt(process.env.PORT || '8443'),
       strictPort: true,
       watch: { ignored: ['**/.figma/**'] },
+      proxy: {
+        '/erpnext': {
+          target: process.env.VITE_ERPNEXT_URL || 'http://localhost:8080',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/erpnext/, ''),
+        },
+        '/chatwoot': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/chatwoot/, ''),
+        },
+      },
     },
     preview: {
       host: '0.0.0.0',

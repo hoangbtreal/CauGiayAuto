@@ -51,10 +51,15 @@ export function WorkOrderBoard({ onSelectOrder }: { onSelectOrder?: (order: Work
       setOrders(data);
       setUseMock(false);
     } catch (e) {
-      // ERPNext chưa sẵn sàng — fallback sang mock data
-      console.warn('[WorkOrderBoard] API unavailable, using mock data:', e);
-      setOrders(MOCK_ORDERS);
-      setUseMock(true);
+      if (api.isDemoMode()) {
+        console.warn('[WorkOrderBoard] API unavailable, using demo mock data:', e);
+        setOrders(MOCK_ORDERS);
+        setUseMock(true);
+      } else {
+        setError(e instanceof Error ? e.message : 'Không thể tải Work Order');
+        setOrders([]);
+        setUseMock(false);
+      }
     } finally {
       setLoading(false);
     }

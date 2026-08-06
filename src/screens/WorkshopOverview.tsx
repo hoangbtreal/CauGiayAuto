@@ -45,16 +45,22 @@ export function WorkshopOverview() {
       setSummary(data);
       setUseMock(false);
     } catch (e) {
-      console.warn('[WorkshopOverview] API unavailable, using mock data:', e);
-      setSummary({
-        date: new Date().toISOString(),
-        total_revenue: 42000000,
-        total_orders: 18,
-        orders_by_status: { 'Tiếp nhận': 2, 'Đang sửa': 8, 'Chờ giao xe': 4, 'Đã hoàn thành': 4 },
-        daily_revenue: MOCK_REVENUE_DATA.map(d => ({ day: d.name, value: d.value })),
-        daily_cars: MOCK_CAR_DATA.map(d => ({ day: d.name, value: d.value })),
-      });
-      setUseMock(true);
+      if (api.isDemoMode()) {
+        console.warn('[WorkshopOverview] API unavailable, using demo mock data:', e);
+        setSummary({
+          date: new Date().toISOString(),
+          total_revenue: 42000000,
+          total_orders: 18,
+          orders_by_status: { 'Tiếp nhận': 2, 'Đang sửa': 8, 'Chờ giao xe': 4, 'Đã hoàn thành': 4 },
+          daily_revenue: MOCK_REVENUE_DATA.map(d => ({ day: d.name, value: d.value })),
+          daily_cars: MOCK_CAR_DATA.map(d => ({ day: d.name, value: d.value })),
+        });
+        setUseMock(true);
+      } else {
+        setError(e instanceof Error ? e.message : 'Không thể tải tổng quan xưởng');
+        setSummary(null);
+        setUseMock(false);
+      }
     } finally {
       setLoading(false);
     }
