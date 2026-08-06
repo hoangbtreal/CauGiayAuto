@@ -103,7 +103,7 @@ export async function logout(): Promise<void> {
 }
 
 export async function getCurrentUser(): Promise<string> {
-  const res = await frappeFetch<{ message: string }>('/api/method/auth');
+  const res = await frappeFetch<{ message: string }>('/api/method/frappe.auth.get_logged_user');
   return res.message;
 }
 
