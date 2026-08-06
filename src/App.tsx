@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from './components/layout/Layout';
+import { checkSession } from './lib/api';
+import { LoginScreen } from './screens/LoginScreen';
 import { WorkOrderBoard } from './screens/WorkOrderBoard';
 import { WorkOrderDetail } from './screens/WorkOrderDetail';
 import { CustomerDirectory } from './screens/CustomerDirectory';
@@ -14,6 +16,31 @@ import type { WorkOrder } from './lib/types';
 function App() {
   const [activeTab, setActiveTab] = useState('board');
   const [selectedOrder, setSelectedOrder] = useState<WorkOrder | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    checkSession().then((ok) => {
+      if (mounted) {
+        setLoggedIn(ok);
+        setAuthChecked(true);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] text-[var(--color-text-secondary)]">
+        Đang kiểm tra phiên đăng nhập...
+      </div>
+    );
+  }
+
+  if (!loggedIn) {
+    return <LoginScreen onLoggedIn={() => setLoggedIn(true)} />;
+  }
 
   const handleSelectOrder = (order: WorkOrder) => {
     setSelectedOrder(order);
@@ -56,7 +83,7 @@ function App() {
   };
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={() => setLoggedIn(false)}>
       {renderContent()}
     </Layout>
   );

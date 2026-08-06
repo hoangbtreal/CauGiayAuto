@@ -102,6 +102,20 @@ export async function logout(): Promise<void> {
   await frappeFetch('/api/method/logout', { method: 'GET' });
 }
 
+export async function getCurrentUser(): Promise<string> {
+  const res = await frappeFetch<{ message: string }>('/api/method/auth');
+  return res.message;
+}
+
+export async function checkSession(): Promise<boolean> {
+  try {
+    const user = await getCurrentUser();
+    return user !== 'Guest';
+  } catch {
+    return false;
+  }
+}
+
 // --- WORK ORDERS ---
 export async function getWorkOrders(status?: WorkOrderStatus): Promise<WorkOrder[]> {
   const filters = status ? JSON.stringify([['status', '=', status]]) : '[]';
