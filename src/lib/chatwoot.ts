@@ -83,7 +83,7 @@ export function clearConfig(): void {
 export async function signIn(baseUrl: string, email: string, password: string): Promise<ChatwootAuthResult> {
   const res = await fetch(`${baseUrl.replace(/\/$/, '')}/auth/sign_in`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'ngrok-skip-browser-warning': 'true' },
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
@@ -119,6 +119,7 @@ async function chatwootRequest<T>(cfg: ChatwootConfig, path: string, options: Re
       'api_access_token': cfg.apiToken,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...options.headers,
     },
     ...options,
