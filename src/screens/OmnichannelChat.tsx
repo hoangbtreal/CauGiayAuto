@@ -414,7 +414,7 @@ function NotConnected({ onConfigure }: { onConfigure: () => void }) {
         <Button
           size="lg"
           variant="outline"
-          onClick={() => window.open('http://localhost:3000', '_blank')}
+          onClick={() => window.open(initialConfig?.baseUrl ?? '/chatwoot', '_blank')}
           className="gap-2"
         >
           Mở Chatwoot (tạm thời)
@@ -439,7 +439,7 @@ function ChatwootSettings({
   onSave: (cfg: ChatwootConfig) => void;
   onClear: () => void;
 }) {
-  const [baseUrl, setBaseUrl] = useState(initialConfig?.baseUrl ?? 'http://localhost:3000');
+  const [baseUrl, setBaseUrl] = useState(initialConfig?.baseUrl ?? '/chatwoot');
   const [accountId, setAccountId] = useState(initialConfig?.accountId ?? '1');
   const [mode, setMode] = useState<'signin' | 'token'>('signin');
   const [email, setEmail] = useState('');
@@ -512,7 +512,7 @@ function ChatwootSettings({
           <input
             value={baseUrl}
             onChange={e => setBaseUrl(e.target.value)}
-            placeholder="http://localhost:3000"
+            placeholder="http://localhost:3000 hoặc /chatwoot"
             className="w-full px-3 py-2 border border-[var(--color-border)] rounded-md bg-[var(--color-background)] text-sm focus:outline-none focus:border-[var(--color-brand-primary)]"
           />
         </div>

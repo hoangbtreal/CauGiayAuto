@@ -19,7 +19,7 @@ import { loadConfig } from './chatwoot';
 // --- Cấu hình ---
 const ERPNEXT_BASE = import.meta.env.VITE_ERPNEXT_URL ?? '/erpnext';
 const ERPNEXT_FALLBACK_BASE = import.meta.env.VITE_ERPNEXT_FALLBACK_URL ?? 'http://localhost:8080';
-const ENV_CHATWOOT_BASE = import.meta.env.VITE_CHATWOOT_URL ?? 'http://localhost:3000';
+const ENV_CHATWOOT_BASE = import.meta.env.VITE_CHATWOOT_URL ?? '/chatwoot';
 const ENV_CHATWOOT_TOKEN = import.meta.env.VITE_CHATWOOT_API_TOKEN ?? '';
 const ENV_CHATWOOT_ACCOUNT_ID = import.meta.env.VITE_CHATWOOT_ACCOUNT_ID ?? '1';
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
