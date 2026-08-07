@@ -1,6 +1,21 @@
 {
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install",
+  "framework": null,
   "rewrites": [
     { "source": "/erpnext/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/erpnext/:path*" },
-    { "source": "/chatwoot/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/chatwoot/:path*" }
+    { "source": "/chatwoot/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/chatwoot/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
   ]
 }
