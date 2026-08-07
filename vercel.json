@@ -1,12 +1,27 @@
 {
-  "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
-  "framework": null,
-  "rewrites": [
-    { "source": "/erpnext/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/erpnext/:path*" },
-    { "source": "/chatwoot/:path*", "destination": "https://deputize-revert-latch.ngrok-free.dev/chatwoot/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "dist": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/erpnext/(.*)",
+      "dest": "https://deputize-revert-latch.ngrok-free.dev/erpnext/$1"
+    },
+    {
+      "src": "/chatwoot/(.*)",
+      "dest": "https://deputize-revert-latch.ngrok-free.dev/chatwoot/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ],
   "headers": [
     {
